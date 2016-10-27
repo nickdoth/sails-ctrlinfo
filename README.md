@@ -23,7 +23,7 @@ UserController = {
       act: (apply) => apply.body(UserService.login, 'username', 'password'),
       view: (user) => ['person/login', !user ? { error: 'Failed' } : null],
       json: (user) => ({user}),
-      sess: (user) => ({ uid: user.id, name: user.name })
+      sessionReplace: (user) => ({ uid: user.id, name: user.name })
     },
     GET: {
       view: () => ['person/login'],
