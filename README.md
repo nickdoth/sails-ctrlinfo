@@ -10,7 +10,7 @@ UserService = {
   login(username, password) {
     return User.find({ ... }).then(user => {
       delete user.password;
-      retrun user;
+      return user;
     });
   },
   ...
