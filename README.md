@@ -8,8 +8,10 @@ Use async functions as sails controller, by adding some request|response descrip
 // Stateless service
 UserService = {
   login(username, password) {
-    // fake :)
-    return Promise.resolve(true);  
+    return User.find({ ... }).then(user => {
+      delete user.password;
+      retrun user;
+    });
   },
   ...
 }
@@ -19,8 +21,9 @@ UserController = {
   login: ctrlInfo({
     POST: {
       act: (apply) => apply.body(UserService.login, 'username', 'password'),
-      view: (isLogin) => ['person/login', !isLogin ? { error: 'Failed' } : null],
-      json: (isLogin) => ({isLogin})
+      view: (user) => ['person/login', !user ? { error: 'Failed' } : null],
+      json: (user) => ({user}),
+      sess: (user) => ({ uid: user.id, name: user.name })
     },
     GET: {
       view: () => ['person/login'],
