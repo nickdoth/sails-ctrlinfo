@@ -55,7 +55,7 @@ function ctrlInfo(ctrl) {
     }
 }
 
-function buildApplies(req: express.Request) {
+function buildApplies(req) {
     return {
         query(servFunc) {
             var args = Array.prototype.slice.call(arguments, 1);
