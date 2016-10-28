@@ -1,7 +1,7 @@
 function ctrlInfo(ctrl) {
     return (req, res) => {
         if (!req.method in ctrl) {
-            req.send('Api Not found');
+            res.send('Api Not found');
         }
 
         var applyFuncs = buildApplies(req);
@@ -31,17 +31,17 @@ function ctrlInfo(ctrl) {
                 });
 
                 if (req.wantsJson) {
-                    promise = promise.then((result) => req.json(ctrl.json(result)));
+                    promise = promise.then((result) => res.json(ctrl.json(result)));
                 }
                 else {
                     promise = promise.then((result) => {
                         if (ctrl.redirect) {
                             typeof ctrl.redirect === 'string' ?
-                                req.redirect(ctrl.redirect) : 
-                                req.redirect(ctrl.redirect(result));
+                                res.redirect(ctrl.redirect) : 
+                                res.redirect(ctrl.redirect(result));
                             return;
                         }
-                        req.view.apply(req, ctrl.view(result));
+                        res.view.apply(res, ctrl.view(result));
                     });
                 }
 
@@ -49,7 +49,7 @@ function ctrlInfo(ctrl) {
                     ctrl.jsonError(err) : ctrl.viewError(err));
             }
             else {
-                req.send('Api Not found');
+                res.send('Api Not found');
             }
         }
     }
