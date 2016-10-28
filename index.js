@@ -1,18 +1,20 @@
-function ctrlInfo(ctrl) {
+function ctrlInfo(ctrlList) {
     return (req, res) => {
-        if (!req.method in ctrl) {
+        if (!req.method in ctrlList) {
+            console.log("req:", req.method);
             res.send('Api Not found');
         }
 
         var applyFuncs = buildApplies(req);
 
-        for (var method in ctrl) {
+        for (var method in ctrlList) {
             if (req.method !== method) {
                 continue;
             }
 
-            var noApi = (req.wantsJson && !ctrl.json) || 
-                (!req.wantsJson && !ctrl.view);
+            var ctrl = ctrlList[method];
+            var noApi = (req.wantsJSON && !ctrl.json) && 
+                (!req.wantsJSON && !ctrl.view);
 
             if (!noApi) {
                 var promise = ctrl.act(applyFuncs, req);
@@ -30,7 +32,7 @@ function ctrlInfo(ctrl) {
                     return result;
                 });
 
-                if (req.wantsJson) {
+                if (req.wantsJSON) {
                     promise = promise.then((result) => res.json(ctrl.json(result)));
                 }
                 else {
@@ -45,8 +47,14 @@ function ctrlInfo(ctrl) {
                     });
                 }
 
-                promise.catch((err) => req.wantsJson ? 
-                    ctrl.jsonError(err) : ctrl.viewError(err));
+                promise.catch((err) => {
+                    if (req.wantsJSON) { 
+                        ctrl.jsonError ? ctrl.jsonError(err) : res.json({ error: err });
+                    }
+                    else {
+                        ctrl.viewError ? ctrl.viewError(err) : res.serverError(err);
+                    }
+                });
             }
             else {
                 res.send('Api Not found');
@@ -59,7 +67,7 @@ function buildApplies(req) {
     return {
         query(servFunc) {
             var args = Array.prototype.slice.call(arguments, 1);
-            servFunc.apply(null, args.map(n => req.query[n]));
+            return servFunc.apply(null, args.map(n => req.query[n]));
         }
     }
 }
