@@ -1,0 +1,22 @@
+{
+  "name": "sails-ctrlinfo",
+  "version": "0.0.2",
+  "description": "Use async functions as sails controller, by adding some request|response descriptions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nickdoth/sails-ctrlinfo.git"
+  },
+  "keywords": [
+    "sails"
+  ],
+  "author": "Nickodth (nick.doth@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nickdoth/sails-ctrlinfo/issues"
+  },
+  "homepage": "https://github.com/nickdoth/sails-ctrlinfo#readme"
+}
