@@ -32,11 +32,14 @@ function ctrlInfo(ctrlList) {
                 });
                 
                 if (ctrl.redirect) {
-                    return promise.then((result) => {
-                        typeof ctrl.redirect === 'string' ?
-                            res.redirect(ctrl.redirect) : 
-                            res.redirect(ctrl.redirect(result, req));
-                    });
+                    if (!req.wantsJSON || !ctrl.redirectJson) {
+                        return promise.then((result) => {
+
+                            typeof ctrl.redirect === 'string' ?
+                                res.redirect(ctrl.redirect) : 
+                                res.redirect(ctrl.redirect(result, req));
+                        });
+                    }
                 }
             }
 
