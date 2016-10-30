@@ -5,8 +5,6 @@ function ctrlInfo(ctrlList) {
             res.send('Api Not found');
         }
 
-        var applyFuncs = buildApplies(req);
-
         for (var method in ctrlList) {
             if (req.method !== method) {
                 continue;
@@ -17,7 +15,7 @@ function ctrlInfo(ctrlList) {
                 (!req.wantsJSON && !ctrl.view);
 
             if (!noApi) {
-                var promise = ctrl.act(applyFuncs, req);
+                var promise = ctrl.act ? ctrl.act(req) : Promise.resolve(null);
                 promise = promise.then((result) => {
                     if (ctrl.sessionReplace) {
                         var sess = ctrl.sessionReplace(result);
