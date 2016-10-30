@@ -55,7 +55,7 @@ function ctrlInfo(ctrlList) {
                         res.view.apply(res, viewAndModel);
                     }
                 }).catch(err => {
-                    ctrl.viewError ? res.send(ctrl.viewError(err)) : res.serverError(err);
+                    ctrl.viewError ? res.view.apply(res, ctrl.viewError(err)) : res.serverError(err);
                 });
             }
         }
