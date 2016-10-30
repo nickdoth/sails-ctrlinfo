@@ -20,7 +20,7 @@ function ctrlInfo(ctrlList) {
                 promise = promise.then((result) => {
                     if (ctrl.sessionReplace) {
                         var sess = ctrl.sessionReplace(result);
-                        req.session.destroy(() => {
+                        req.session.regenerate(() => {
                             Object.assign(req.session, sess);
                         });
                     }
