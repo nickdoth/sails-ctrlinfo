@@ -35,7 +35,7 @@ function ctrlInfo(ctrlList) {
                     return promise.then((result) => {
                         typeof ctrl.redirect === 'string' ?
                             res.redirect(ctrl.redirect) : 
-                            res.redirect(ctrl.redirect(result));
+                            res.redirect(ctrl.redirect(result, req));
                     });
                 }
             }
