@@ -20,7 +20,7 @@ UserService = {
 UserController = {
   login: ctrlInfo({
     POST: {
-      act: (req) => apply.body(UserService.login, 'username', 'password'),
+      act: (req) => UserService.login(req.body.username, req.body.password),
       view: (user) => ['person/login', !user ? { error: 'Failed' } : null],
       json: (user) => ({user}),
       sessionReplace: (user) => ({ uid: user.id, name: user.name })
