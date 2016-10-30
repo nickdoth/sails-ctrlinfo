@@ -12,7 +12,8 @@ function ctrlInfo(ctrlList) {
 
             var ctrl = ctrlList[method];
             var noApi = (req.wantsJSON && !ctrl.json) && 
-                (!req.wantsJSON && !ctrl.view);
+                (!req.wantsJSON && (!ctrl.view)) && 
+                !ctrl.redirect;
 
             if (!noApi) {
                 var promise = ctrl.act ? ctrl.act(req) : Promise.resolve(null);
@@ -29,33 +30,34 @@ function ctrlInfo(ctrlList) {
                     }
                     return result;
                 });
-
-                if (req.wantsJSON) {
-                    promise = promise.then((result) => res.json(ctrl.json(result)));
-                }
-                else {
-                    promise = promise.then((result) => {
-                        if (ctrl.redirect) {
-                            typeof ctrl.redirect === 'string' ?
-                                res.redirect(ctrl.redirect) : 
-                                res.redirect(ctrl.redirect(result));
-                            return;
-                        }
-                        res.view.apply(res, ctrl.view(result));
+                
+                if (ctrl.redirect) {
+                    return promise.then((result) => {
+                        typeof ctrl.redirect === 'string' ?
+                            res.redirect(ctrl.redirect) : 
+                            res.redirect(ctrl.redirect(result));
                     });
                 }
+            }
 
-                promise.catch((err) => {
-                    if (req.wantsJSON) { 
-                        ctrl.jsonError ? ctrl.jsonError(err) : res.json({ error: err });
-                    }
-                    else {
-                        ctrl.viewError ? ctrl.viewError(err) : res.serverError(err);
-                    }
+            if (req.wantsJSON) {
+                if (noApi) {
+                    ctrl.jsonError ? res.json(ctrl.jsonError('ApiNotFound')) : res.json({error: 'ApiNotFound'});
+                    return;
+                }
+                return promise.then((result) => res.json(ctrl.json(result))).catch(err => {
+                    ctrl.jsonError ? res.json(ctrl.jsonError(err)) : res.json({ error: err });
                 });
             }
             else {
-                res.send('Api Not found');
+                if (noApi) {
+                    ctrl.viewError ? res.send(ctrl.viewError('ApiNotFound')) : res.badRequest('ApiNotFound');   
+                }
+                return promise.then((result) => {
+                    res.view.apply(res, ctrl.view(result));
+                }).catch(err => {
+                    ctrl.viewError ? res.send(ctrl.viewError(err)) : res.serverError(err);
+                });
             }
         }
     }
