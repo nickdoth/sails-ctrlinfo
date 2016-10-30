@@ -31,16 +31,6 @@ function ctrlInfo(ctrlList) {
                     return result;
                 });
                 
-                if (ctrl.redirect) {
-                    if (!req.wantsJSON || !ctrl.redirectJson) {
-                        return promise.then((result) => {
-
-                            typeof ctrl.redirect === 'string' ?
-                                res.redirect(ctrl.redirect) : 
-                                res.redirect(ctrl.redirect(result, req));
-                        });
-                    }
-                }
             }
 
             if (req.wantsJSON) {
@@ -57,7 +47,13 @@ function ctrlInfo(ctrlList) {
                     ctrl.viewError ? res.send(ctrl.viewError('ApiNotFound')) : res.badRequest('ApiNotFound');   
                 }
                 return promise.then((result) => {
-                    res.view.apply(res, ctrl.view(result, req));
+                    var viewAndModel = ctrl.view(result, req);
+                    if (typeof viewAndModel === 'string') {
+                        res.redirect(viewAndModel);
+                    }
+                    else {
+                        res.view.apply(res, viewAndModel);
+                    }
                 }).catch(err => {
                     ctrl.viewError ? res.send(ctrl.viewError(err)) : res.serverError(err);
                 });
