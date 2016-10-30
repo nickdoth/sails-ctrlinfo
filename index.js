@@ -45,7 +45,7 @@ function ctrlInfo(ctrlList) {
                     ctrl.jsonError ? res.json(ctrl.jsonError('ApiNotFound')) : res.json({error: 'ApiNotFound'});
                     return;
                 }
-                return promise.then((result) => res.json(ctrl.json(result))).catch(err => {
+                return promise.then((result) => res.json(ctrl.json(result, req))).catch(err => {
                     ctrl.jsonError ? res.json(ctrl.jsonError(err)) : res.json({ error: err });
                 });
             }
@@ -54,7 +54,7 @@ function ctrlInfo(ctrlList) {
                     ctrl.viewError ? res.send(ctrl.viewError('ApiNotFound')) : res.badRequest('ApiNotFound');   
                 }
                 return promise.then((result) => {
-                    res.view.apply(res, ctrl.view(result));
+                    res.view.apply(res, ctrl.view(result, req));
                 }).catch(err => {
                     ctrl.viewError ? res.send(ctrl.viewError(err)) : res.serverError(err);
                 });
