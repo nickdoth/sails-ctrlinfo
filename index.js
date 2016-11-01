@@ -4,6 +4,8 @@ function ctrlInfo(ctrlList) {
             console.log("req:", req.method);
             res.send('Api Not found');
         }
+        
+        expressSupport(req, res);
 
         for (var method in ctrlList) {
             if (req.method !== method) {
@@ -44,7 +46,7 @@ function ctrlInfo(ctrlList) {
             }
             else {
                 if (noApi) {
-                    ctrl.viewError ? res.send(ctrl.viewError('ApiNotFound')) : res.badRequest('ApiNotFound');   
+                    ctrl.viewError ? res.send(ctrl.viewError('ApiNotFound')) : res.send('ApiNotFound');   
                 }
                 return promise.then((result) => {
                     var viewAndModel = ctrl.view(result, req);
@@ -55,7 +57,7 @@ function ctrlInfo(ctrlList) {
                         res.view.apply(res, viewAndModel);
                     }
                 }).catch(err => {
-                    ctrl.viewError ? res.view.apply(res, ctrl.viewError(err)) : res.serverError(err);
+                    ctrl.viewError ? res.view.apply(res, ctrl.viewError(err)) : res.send('<pre>' + err + '</pre>');
                 });
             }
         }
@@ -67,6 +69,23 @@ function buildApplies(req) {
         query(servFunc) {
             var args = Array.prototype.slice.call(arguments, 1);
             return servFunc.apply(null, args.map(n => req.query[n]));
+        }
+    }
+}
+
+function expressSupport(req, res, ctrl) {
+    if (!res.view) {
+        res.view = res.render;
+    }
+    
+    if (!req.hasOwnProperty('wantsJSON')) {
+        if (req.hasOwnProperty('wantsJson')) {
+            req.wantsJSON = req.wantsJson;
+        }
+        else {
+            req.wantsJSON = req.xhr || 
+                req.accepts('html', 'json') === 'json' || 
+                (req.get('Accept') && req.get('Accept').indexOf('html') < 0);
         }
     }
 }
