@@ -1,13 +1,15 @@
-declare interface RequestControl<T> {
-  [method: string]: {
-    act: (apply: ApplyMethods<T>) => Promise<T>,
-    view?: (result: T) => [ string, any ],
-    viewError?: (result: T) => [ string, any ],
-    json?: (result: T) => any,
-    jsonError?: (result: T) => any,
-    session?: (result: T) => any,
-    sessionReplace?: (result: T) => any
-  };
+declare interface RequestControlMap {
+  [method: string]: RequestControl<any>;
 }
 
-export default function ctrlInfo<T>(ctrl: RequestControl<T>) : (req: any, res: any) => void;
+interface RequestControl<T> {
+  act?: (req: any) => PromiseLike<T>,
+  view?: (result: T) => [ string, any ] | string,
+  viewError?: (err: any) => [ string, any ],
+  json?: (result: T) => any,
+  jsonError?: (err: any) => any,
+  session?: (result: T) => any,
+  sessionReplace?: (result: T) => any
+}
+
+export default function ctrlInfo(ctrl: RequestControlMap) : (req: any, res: any) => void;
